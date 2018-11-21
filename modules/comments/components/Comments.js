@@ -6,6 +6,7 @@ import {SafeAreaView} from "react-navigation";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import {getComments, saveComment} from "../actions";
 import distanceInWords from 'date-fns/distance_in_words'
+import ActivityLoader from "../../common/ActivityLoader";
 
 class Comments extends Component {
 
@@ -19,6 +20,8 @@ class Comments extends Component {
     }
 
     static getDerivedStateFromProps(props) {
+        if (props.isLoading)
+            return null;
         return {comments: [{type: 'header'}, ...props.comments]};
     }
 
@@ -73,8 +76,8 @@ class Comments extends Component {
         else
             return (
                 <View style={styles.card}>
-                    <Text style={styles.commentTimeText}>{distanceInWords(item.timestamp, new Date())} ago</Text>
                     <Text style={styles.commentText}>{item.comment}</Text>
+                    <Text style={styles.commentTimeText}>{distanceInWords(item.timestamp, new Date())} ago</Text>
                 </View>
             );
     }
@@ -117,9 +120,9 @@ class Comments extends Component {
                             value={this.state.comment}
                             onChangeText={(text) => this.setState({comment: text})}
                             style={styles.commentInput}
-                            maxLength={150}
+                            maxLength={300}
                             placeholder={'Write comment'}
-                            placeholderTextColor={'#CCCCCC'}
+                            placeholderTextColor={'#FFFFFF'}
                             selectTextOnFocus={true}
                             underlineColorAndroid={'transparent'}
                             multiline={true}/>
@@ -130,6 +133,7 @@ class Comments extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <ActivityLoader loading={this.props.isLoading}/>
             </SafeAreaView>
         );
     }
@@ -143,7 +147,8 @@ const mapDispatchToProps = dispatch => {
 };
 
 const mapStateToProps = state => ({
-    comments: state.comments.comments.comments
+    comments: state.comments.comments.comments,
+    isLoading: state.comments.comments.isLoading
 });
 
 export default connect(
@@ -215,6 +220,7 @@ const styles = StyleSheet.create({
     commentTimeText: {
         fontFamily: 'Product Sans Regular',
         fontSize: 10,
-        textAlign: 'right'
+        textAlign: 'right',
+        marginBottom: 5
     }
 });
